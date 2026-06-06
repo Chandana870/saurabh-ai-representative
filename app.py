@@ -1,7 +1,7 @@
 import streamlit as st
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
+from streamlit_mic_recorder import mic_recorder
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
@@ -102,6 +102,14 @@ for msg in st.session_state.messages:
 
 # User Input
 user_query = st.chat_input("Ask anything about Saurabh...")
+
+st.write("### 🎤 Voice Input")
+
+audio = mic_recorder(
+    start_prompt="🎤 Start Recording",
+    stop_prompt="⏹ Stop Recording",
+    just_once=True
+)
 
 if user_query:
 
