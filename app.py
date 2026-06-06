@@ -1,4 +1,6 @@
 import streamlit as st
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -50,13 +52,44 @@ embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Load Chroma Database
-db = Chroma(
-    persist_directory="chroma_db",
-    embedding_function=embeddings
-)
+@st.cache_resource
+def load_retriever():
 
-retriever = db.as_retriever(search_kwargs={"k": 4})
+    files = [
+        "data/about_saurabh.md",
+        "data/traffic.md",
+        "data/image_search.md",
+        "data/mlflow.md"
+    ]
+
+    docs = []
+
+    for file in files:
+        with open(file, "r", encoding="utf-8") as f:
+            text = f.read()
+
+        docs.append(
+            Document(
+                page_content=text,
+                metadata={"source": file}
+            )
+        )
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+
+    chunks = splitter.split_documents(docs)
+
+    db = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings
+    )
+
+    return db.as_retriever(search_kwargs={"k": 4})
+
+retriever = load_retriever()
 
 # Chat History
 if "messages" not in st.session_state:
