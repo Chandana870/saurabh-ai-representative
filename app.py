@@ -11,6 +11,9 @@ st.set_page_config(
 )
 
 st.title("🤖 Saurabh AI Representative")
+vapi_url = "https://app.vapi.ai/assistant/2256e30a-235f-448a-81b9-c0742361a277"
+
+st.link_button("🎤 Talk to Voice Assistant", vapi_url)
 with st.sidebar:
     st.header("About Saurabh")
 
